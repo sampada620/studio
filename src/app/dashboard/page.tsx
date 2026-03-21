@@ -17,7 +17,9 @@ import {
   AlertCircle,
   FileText,
   Star,
-  CheckCircle2
+  CheckCircle2,
+  MessageSquareText,
+  ArrowRight
 } from 'lucide-react';
 
 export default function Dashboard() {
