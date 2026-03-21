@@ -3,7 +3,7 @@
 
 ## 🚀 Live Demo
 
-🔗 cogniprepai.vercel.app
+🔗cogniprepai.vercel.app
 
 ---
 
