@@ -19,13 +19,15 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 export default function DashboardLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.Node;
 }) {
   const pathname = usePathname();
   const [userName, setUserName] = useState("User");
   const [userInitials, setUserInitials] = useState("U");
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     const storedName = sessionStorage.getItem('userName');
     const storedInitials = sessionStorage.getItem('userInitials');
     if (storedName) {
@@ -52,6 +54,36 @@ export default function DashboardLayout({
       </Button>
     </>
   );
+
+  // Prevent hydration mismatch: render static shell or nothing until mounted
+  if (!mounted) {
+    return (
+      <div className="flex min-h-screen bg-background text-foreground">
+        <aside className="w-64 bg-white border-r hidden md:flex flex-col">
+          <div className="p-6">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                <BrainCircuit className="text-white w-5 h-5" />
+              </div>
+              <span className="text-xl font-headline font-bold text-primary">CogniPrep AI</span>
+            </div>
+          </div>
+          <div className="flex-grow flex items-center justify-center p-8">
+            <div className="w-full h-4 bg-muted animate-pulse rounded" />
+          </div>
+        </aside>
+        <div className="flex-grow flex flex-col">
+          <header className="h-16 bg-white border-b px-4 md:px-8 flex items-center justify-between" />
+          <main className="flex-grow p-8">
+            <div className="max-w-6xl mx-auto space-y-4">
+              <div className="h-8 w-64 bg-muted animate-pulse rounded" />
+              <div className="h-32 w-full bg-muted animate-pulse rounded" />
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-background text-foreground">
@@ -84,7 +116,7 @@ export default function DashboardLayout({
       <div className="flex-grow flex flex-col">
         <header className="h-16 bg-white border-b px-4 md:px-8 flex items-center justify-between sticky top-0 z-10">
           <div className="flex items-center gap-4">
-            {/* Mobile Nav */}
+            {/* Mobile Nav - Defer rendering until mounted to avoid Radix ID mismatch */}
             <div className="md:hidden">
               <Sheet>
                 <SheetTrigger asChild>
