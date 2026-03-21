@@ -18,7 +18,8 @@ import {
   Zap,
   ShieldCheck,
   Search,
-  ChevronRight
+  ChevronRight,
+  Loader2
 } from 'lucide-react';
 
 // Mock data for existing sessions to prevent loading hang
@@ -230,31 +231,14 @@ export default function FeedbackReport({ params }: { params: Promise<{ id: strin
               <h3 className="text-3xl font-headline font-bold">Personalized Improvement Plan</h3>
               <p className="text-secondary-foreground/80 max-w-xl">We&apos;ve curated a learning path based on your performance to bridge your skill gaps before your real interview.</p>
             </div>
-            <Button size="lg" className="bg-white text-secondary hover:bg-white/90 h-14 px-8 rounded-full font-bold">
-              View My Roadmap <ChevronRight className="ml-2 w-5 h-5" />
-            </Button>
+            <Link href="/dashboard/roadmap">
+              <Button size="lg" className="bg-white text-secondary hover:bg-white/90 h-14 px-8 rounded-full font-bold">
+                View My Roadmap <ChevronRight className="ml-2 w-5 h-5" />
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       </main>
     </div>
-  );
-}
-
-function Loader2({ className }: { className?: string }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-    </svg>
   );
 }
