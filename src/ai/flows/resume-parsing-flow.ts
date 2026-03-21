@@ -57,7 +57,6 @@ export async function parseResume(input: ResumeParsingInput): Promise<ResumePars
 
 const prompt = ai.definePrompt({
   name: 'resumeParsingPrompt',
-  model: 'googleai/gemini-1.5-flash',
   input: {schema: ResumeParsingInputSchema},
   output: {schema: ResumeParsingOutputSchema},
   prompt: `You are an expert resume parser. Your task is to accurately extract key information from the provided resume.
