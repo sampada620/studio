@@ -1,4 +1,4 @@
-#CogniPrep AI 
+# CogniPrep AI 
 (AI-Powered Interview Preparation Platform)
 
 This is a NextJS starter in Firebase Studio.
