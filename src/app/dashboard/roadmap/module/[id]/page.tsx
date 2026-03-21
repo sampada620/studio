@@ -12,7 +12,8 @@ import {
   BookOpen, 
   Clock, 
   ChevronRight,
-  Loader2
+  Loader2,
+  Trophy
 } from 'lucide-react';
 import Image from 'next/image';
 
