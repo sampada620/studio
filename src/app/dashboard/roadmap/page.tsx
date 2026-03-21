@@ -134,8 +134,10 @@ export default function RoadmapPage() {
                       {module.progress > 0 && module.progress < 100 && (
                         <span className="text-sm font-bold text-primary">{module.progress}%</span>
                       )}
-                      <Button size="sm" variant={module.status === 'Completed' ? 'outline' : 'default'} className="rounded-full">
-                        {module.status === 'Completed' ? 'Review' : 'Start Now'} <ChevronRight className="ml-1 w-4 h-4" />
+                      <Button size="sm" variant={module.status === 'Completed' ? 'outline' : 'default'} className="rounded-full" asChild>
+                        <Link href={`/dashboard/roadmap/module/${module.id}`}>
+                          {module.status === 'Completed' ? 'Review' : 'Start Now'} <ChevronRight className="ml-1 w-4 h-4" />
+                        </Link>
                       </Button>
                     </div>
                   </div>
