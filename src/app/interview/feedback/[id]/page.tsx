@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -21,26 +21,71 @@ import {
   ChevronRight
 } from 'lucide-react';
 
-export default function FeedbackReport() {
-  const router = useRouter();
+// Mock data for existing sessions to prevent loading hang
+const MOCK_FEEDBACKS = [
+  {
+    question: "Tell me about a time you faced a significant technical challenge and how you overcame it.",
+    answerQualityFeedback: "Great structure using the STAR method. You clearly defined the conflict and the technical resolution.",
+    communicationFeedback: "Very clear and professional tone. Good eye contact (simulated).",
+    technicalAccuracyFeedback: "Demonstrated deep understanding of system architecture and performance trade-offs."
+  },
+  {
+    question: "How do you handle state management in large scale React applications?",
+    answerQualityFeedback: "Comprehensive answer covering various tools like Redux, Context API, and Zustand.",
+    communicationFeedback: "Articulate explanation of complex concepts. Could be slightly more concise.",
+    technicalAccuracyFeedback: "Correctly identified when to use server state (React Query) vs client state."
+  }
+];
+
+export default function FeedbackReport({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = use(params);
+  const sessionId = resolvedParams.id;
+  
   const [feedbacks, setFeedbacks] = useState<any[]>([]);
-  const [role, setRole] = useState("");
+  const [role, setRole] = useState("Software Engineer");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const data = sessionStorage.getItem('lastInterviewFeedback');
-    const savedRole = sessionStorage.getItem('currentInterviewRole');
-    if (data) {
-      setFeedbacks(JSON.parse(data));
-    }
-    if (savedRole) {
-      setRole(savedRole);
-    }
-  }, []);
+    const loadData = () => {
+      // If it's the most recent session
+      if (sessionId === 'last') {
+        const data = sessionStorage.getItem('lastInterviewFeedback');
+        const savedRole = sessionStorage.getItem('currentInterviewRole');
+        if (data) {
+          setFeedbacks(JSON.parse(data));
+          if (savedRole) setRole(savedRole);
+        } else {
+          // Fallback to mock if nothing in session
+          setFeedbacks(MOCK_FEEDBACKS);
+        }
+      } else {
+        // For historical mock sessions (IDs 1-5 from history page)
+        setFeedbacks(MOCK_FEEDBACKS);
+        // Map ID to roles just for the prototype feel
+        const roles: Record<string, string> = {
+          '1': "Senior Frontend Developer",
+          '2': "React Native Developer",
+          '3': "Full Stack Engineer",
+          '4': "UI Designer",
+          '5': "Backend Developer"
+        };
+        if (roles[sessionId]) setRole(roles[sessionId]);
+      }
+      setIsLoading(false);
+    };
 
-  if (!feedbacks.length) {
+    // Small delay to simulate processing
+    const timer = setTimeout(loadData, 800);
+    return () => clearTimeout(timer);
+  }, [sessionId]);
+
+  if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-10 h-10 animate-spin text-primary" />
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-12 h-12 animate-spin text-primary" />
+          <p className="text-muted-foreground font-medium animate-pulse">Analyzing your performance...</p>
+        </div>
       </div>
     );
   }
@@ -51,7 +96,7 @@ export default function FeedbackReport() {
       <header className="bg-white border-b py-6 sticky top-0 z-10 shadow-sm">
         <div className="container mx-auto px-6 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link href="/dashboard">
+            <Link href="/dashboard/history">
               <Button variant="ghost" size="icon">
                 <ArrowLeft className="w-5 h-5" />
               </Button>
