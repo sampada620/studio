@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { 
   ArrowLeft, 
   Play, 
+  Pause,
   CheckCircle2, 
   BookOpen, 
   Clock, 
@@ -16,6 +17,7 @@ import {
   Trophy
 } from 'lucide-react';
 import Image from 'next/image';
+import { useToast } from '@/hooks/use-toast';
 
 const MODULES_DATA: Record<string, any> = {
   "1": {
@@ -56,17 +58,52 @@ const MODULES_DATA: Record<string, any> = {
 export default function ModuleStudyPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const moduleId = resolvedParams.id;
+  const { toast } = useToast();
+  
   const [module, setModule] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isCompleted, setIsCompleted] = useState(false);
 
   useEffect(() => {
-    // Simulate data fetch
     const timer = setTimeout(() => {
       setModule(MODULES_DATA[moduleId] || MODULES_DATA["1"]);
       setIsLoading(false);
     }, 600);
     return () => clearTimeout(timer);
   }, [moduleId]);
+
+  const handlePlayToggle = () => {
+    setIsPlaying(!isPlaying);
+    if (!isPlaying) {
+      toast({
+        title: "Video Started",
+        description: "Now playing: Lesson 1 - Introduction",
+      });
+    }
+  };
+
+  const handleDownloadPDF = () => {
+    toast({
+      title: "Download Started",
+      description: "Preparing your study guide PDF for download...",
+    });
+  };
+
+  const handleStartQuiz = () => {
+    toast({
+      title: "Quiz Started",
+      description: "Opening the module self-check quiz in a new window.",
+    });
+  };
+
+  const handleCompleteModule = () => {
+    setIsCompleted(true);
+    toast({
+      title: "Congratulations!",
+      description: "You've marked this module as complete. Achievement unlocked!",
+    });
+  };
 
   if (isLoading) {
     return (
@@ -92,21 +129,38 @@ export default function ModuleStudyPage({ params }: { params: Promise<{ id: stri
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main Content Area */}
         <div className="lg:col-span-2 space-y-6">
           <Card className="border-none shadow-sm overflow-hidden bg-black aspect-video relative group flex items-center justify-center">
-             <Image 
-                src={`https://picsum.photos/seed/${moduleId}/1280/720`} 
-                alt="Lesson Thumbnail" 
-                fill 
-                className="object-cover opacity-60 group-hover:scale-105 transition-transform duration-500"
-                data-ai-hint="learning video"
-             />
+             {!isPlaying && (
+               <Image 
+                  src={`https://picsum.photos/seed/${moduleId}/1280/720`} 
+                  alt="Lesson Thumbnail" 
+                  fill 
+                  className="object-cover opacity-60 group-hover:scale-105 transition-transform duration-500"
+                  data-ai-hint="learning video"
+               />
+             )}
+             
+             {isPlaying && (
+               <div className="absolute inset-0 flex items-center justify-center bg-slate-900">
+                  <div className="text-white text-center space-y-4">
+                    <Loader2 className="w-12 h-12 animate-spin mx-auto opacity-50" />
+                    <p className="font-mono text-sm opacity-50">STREAMING CONTENT...</p>
+                  </div>
+               </div>
+             )}
+
              <div className="relative z-10 text-center">
-                <Button size="lg" className="h-16 w-16 rounded-full bg-white text-black hover:bg-white/90">
-                    <Play className="fill-current w-6 h-6 ml-1" />
+                <Button 
+                  size="lg" 
+                  className="h-16 w-16 rounded-full bg-white text-black hover:bg-white/90"
+                  onClick={handlePlayToggle}
+                >
+                    {isPlaying ? <Pause className="fill-current w-6 h-6" /> : <Play className="fill-current w-6 h-6 ml-1" />}
                 </Button>
-                <p className="mt-4 text-white font-bold text-lg shadow-sm">Play Lesson 1: Introduction</p>
+                <p className="mt-4 text-white font-bold text-lg shadow-sm">
+                  {isPlaying ? "Pause Lesson" : "Play Lesson 1: Introduction"}
+                </p>
              </div>
           </Card>
 
@@ -116,14 +170,14 @@ export default function ModuleStudyPage({ params }: { params: Promise<{ id: stri
               <CardDescription>Handy links and documents for this module.</CardDescription>
             </CardHeader>
             <CardContent className="grid sm:grid-cols-2 gap-4">
-               <Button variant="outline" className="justify-start h-auto py-3 px-4">
+               <Button variant="outline" className="justify-start h-auto py-3 px-4" onClick={handleDownloadPDF}>
                   <BookOpen className="mr-3 w-5 h-5 text-primary" />
                   <div className="text-left">
                     <div className="font-bold text-sm">Study Guide PDF</div>
                     <div className="text-[10px] text-muted-foreground uppercase">Downloadable</div>
                   </div>
                </Button>
-               <Button variant="outline" className="justify-start h-auto py-3 px-4">
+               <Button variant="outline" className="justify-start h-auto py-3 px-4" onClick={handleStartQuiz}>
                   <CheckCircle2 className="mr-3 w-5 h-5 text-green-500" />
                   <div className="text-left">
                     <div className="font-bold text-sm">Self-Check Quiz</div>
@@ -134,7 +188,6 @@ export default function ModuleStudyPage({ params }: { params: Promise<{ id: stri
           </Card>
         </div>
 
-        {/* Sidebar - Lessons List */}
         <div className="space-y-6">
           <Card className="border-none shadow-sm">
             <CardHeader>
@@ -167,8 +220,12 @@ export default function ModuleStudyPage({ params }: { params: Promise<{ id: stri
               </div>
             </CardContent>
             <div className="p-4 border-t">
-               <Button className="w-full bg-primary h-12 rounded-xl font-bold">
-                  Mark as Complete
+               <Button 
+                className="w-full bg-primary h-12 rounded-xl font-bold"
+                onClick={handleCompleteModule}
+                disabled={isCompleted}
+               >
+                  {isCompleted ? "Module Completed!" : "Mark as Complete"}
                </Button>
             </div>
           </Card>
