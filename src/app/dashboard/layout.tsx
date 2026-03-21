@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import Link from 'next/navigation';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -12,8 +12,7 @@ import {
   LogOut, 
   User, 
   TrendingUp,
-  Menu,
-  X
+  Menu
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
@@ -55,7 +54,7 @@ export default function DashboardLayout({
   );
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen bg-background text-foreground">
       {/* Sidebar - Desktop */}
       <aside className="w-64 bg-white border-r hidden md:flex flex-col">
         <div className="p-6">
@@ -109,12 +108,12 @@ export default function DashboardLayout({
               </Sheet>
             </div>
             <h1 className="text-xl font-headline font-bold capitalize">
-              {pathname === '/dashboard' ? 'Overview' : pathname.split('/').pop()}
+              {pathname === '/dashboard' ? 'Overview' : pathname.split('/').pop()?.replace('-', ' ')}
             </h1>
           </div>
           
           <div className="flex items-center gap-4">
-            <Badge variant="outline" className="font-medium bg-muted/50 hidden sm:flex">PRO Plan</Badge>
+            <Badge variant="outline" className="font-medium bg-muted/50 hidden sm:flex border-primary/20 text-primary">PRO Plan</Badge>
             <div className="flex items-center gap-3">
               <div className="text-right hidden sm:block">
                 <p className="text-sm font-bold leading-none">{userName}</p>
@@ -127,7 +126,7 @@ export default function DashboardLayout({
           </div>
         </header>
 
-        <main className="flex-grow overflow-auto">
+        <main className="flex-grow overflow-auto bg-background">
           {children}
         </main>
       </div>
