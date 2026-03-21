@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,7 +23,19 @@ import {
 } from 'lucide-react';
 
 export default function Dashboard() {
-  const [userName] = useState("John Doe");
+  const [userName, setUserName] = useState("User");
+  const [userInitials, setUserInitials] = useState("U");
+
+  useEffect(() => {
+    const storedName = sessionStorage.getItem('userName');
+    const storedInitials = sessionStorage.getItem('userInitials');
+    if (storedName) {
+      setUserName(storedName);
+    }
+    if (storedInitials) {
+      setUserInitials(storedInitials);
+    }
+  }, []);
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -54,7 +66,10 @@ export default function Dashboard() {
         </nav>
 
         <div className="p-4 border-t">
-          <Button variant="ghost" className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/5">
+          <Button variant="ghost" className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/5" onClick={() => {
+            sessionStorage.clear();
+            window.location.href = '/auth/login';
+          }}>
             <LogOut className="mr-2 w-4 h-4" /> Log Out
           </Button>
         </div>
@@ -67,7 +82,7 @@ export default function Dashboard() {
           <div className="flex items-center gap-4">
             <Badge variant="outline" className="font-medium bg-muted/50">PRO Plan</Badge>
             <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
-              JD
+              {userInitials}
             </div>
           </div>
         </header>

@@ -12,10 +12,21 @@ import { BrainCircuit, Loader2, Check } from 'lucide-react';
 export default function SignupPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: ''
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    
+    // Store user info in session storage for the demo
+    sessionStorage.setItem('userName', `${formData.firstName} ${formData.lastName}`);
+    sessionStorage.setItem('userInitials', `${formData.firstName[0]}${formData.lastName[0]}`.toUpperCase());
+    
     // Simulate signup
     setTimeout(() => {
       router.push('/dashboard');
@@ -74,20 +85,45 @@ export default function SignupPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="first-name">First Name</Label>
-                    <Input id="first-name" placeholder="John" required />
+                    <Input 
+                      id="first-name" 
+                      placeholder="John" 
+                      required 
+                      value={formData.firstName}
+                      onChange={(e) => setFormData({...formData, firstName: e.target.value})}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="last-name">Last Name</Label>
-                    <Input id="last-name" placeholder="Doe" required />
+                    <Input 
+                      id="last-name" 
+                      placeholder="Doe" 
+                      required 
+                      value={formData.lastName}
+                      onChange={(e) => setFormData({...formData, lastName: e.target.value})}
+                    />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" placeholder="name@example.com" required />
+                  <Input 
+                    id="email" 
+                    type="email" 
+                    placeholder="name@example.com" 
+                    required 
+                    value={formData.email}
+                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="password">Password</Label>
-                  <Input id="password" type="password" required />
+                  <Input 
+                    id="password" 
+                    type="password" 
+                    required 
+                    value={formData.password}
+                    onChange={(e) => setFormData({...formData, password: e.target.value})}
+                  />
                 </div>
               </CardContent>
               <CardFooter className="flex flex-col space-y-4">
