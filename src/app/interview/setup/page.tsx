@@ -20,7 +20,8 @@ import {
   ChevronRight, 
   ChevronLeft,
   FileCheck,
-  Briefcase
+  Briefcase,
+  FileWarning
 } from 'lucide-react';
 import { parseResume } from '@/ai/flows/resume-parsing-flow';
 import { useToast } from '@/hooks/use-toast';
@@ -38,27 +39,46 @@ export default function InterviewSetup() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    if (file.type !== 'application/pdf') {
+      toast({
+        variant: "destructive",
+        title: "Invalid File Type",
+        description: "Please upload your resume in PDF format for the best AI analysis.",
+      });
+      return;
+    }
+
     setIsUploading(true);
     try {
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = async () => {
         const dataUri = reader.result as string;
-        const result = await parseResume({ resumeDataUri: dataUri });
-        setResumeData(result);
-        toast({
-          title: "Resume Parsed Successfully",
-          description: `Extracted ${result.skills.length} skills and ${result.experience.length} experiences.`,
-        });
-        setStep(2);
+        try {
+          const result = await parseResume({ resumeDataUri: dataUri });
+          setResumeData(result);
+          toast({
+            title: "Resume Parsed Successfully",
+            description: `Extracted ${result.skills.length} skills and ${result.experience.length} experiences.`,
+          });
+          setStep(2);
+        } catch (error) {
+          console.error(error);
+          toast({
+            variant: "destructive",
+            title: "Analysis Failed",
+            description: "The AI had trouble reading this PDF. Please ensure it's not password protected.",
+          });
+        } finally {
+          setIsUploading(false);
+        }
       };
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "Parsing Failed",
-        description: "Could not read your resume. Please try another file.",
+        title: "Upload Failed",
+        description: "Could not read your file. Please try again.",
       });
-    } finally {
       setIsUploading(false);
     }
   };
@@ -111,14 +131,14 @@ export default function InterviewSetup() {
                   <input 
                     type="file" 
                     className="absolute inset-0 opacity-0 cursor-pointer" 
-                    accept=".pdf,.doc,.docx"
+                    accept=".pdf"
                     onChange={handleFileUpload}
                     disabled={isUploading}
                   />
                   {isUploading ? (
                     <div className="space-y-4 py-4">
                       <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto" />
-                      <p className="font-medium animate-pulse">AI is reading your resume...</p>
+                      <p className="font-medium animate-pulse">AI is analyzing your resume...</p>
                     </div>
                   ) : (
                     <>
@@ -127,11 +147,17 @@ export default function InterviewSetup() {
                       </div>
                       <div className="space-y-1">
                         <p className="text-lg font-bold">Click or drag to upload</p>
-                        <p className="text-sm text-muted-foreground">PDF, DOCX (Max 5MB)</p>
+                        <p className="text-sm text-muted-foreground">PDF Only (Max 5MB)</p>
                       </div>
                     </>
                   )}
                 </div>
+                
+                <div className="flex items-center gap-2 p-3 bg-blue-50 text-blue-800 rounded-lg text-xs font-medium border border-blue-100">
+                  <FileWarning className="w-4 h-4 shrink-0" />
+                  PDF is required for the most accurate skill extraction.
+                </div>
+
                 <div className="text-center">
                   <Button variant="ghost" className="text-muted-foreground" onClick={() => setStep(2)}>
                     Skip and use basic profile
